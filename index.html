@@ -13,15 +13,32 @@
       padding: 10px; 
       border: 1px solid #ccc; 
       border-radius: 8px;
-      max-width: 300px;
+      max-width: 350px;
     }
     #weather img { width: 50px; height: 50px; }
+    select { margin-top: 10px; padding: 5px; }
   </style>
 </head>
 <body>
-  <h1>你好，我的网站已经启动！</h1>
+  <h1>Hi，网站运行正常！</h1>
 
-  <!-- 天气模块开始 -->
+  <!-- 城市选择 -->
+  <label for="city-select">选择城市：</label>
+  <select id="city-select">
+    <option value="101010100">北京</option>
+    <option value="101020100">上海</option>
+    <option value="101280101">广州</option>
+    <option value="101210101">武汉</option>
+    <option value="101030100">天津</option>
+    <option value="101190101">香港</option>
+    <option value="101140101">西安</option>
+    <option value="101040100">重庆</option>
+    <option value="101230101">杭州</option>
+    <option value="101250101">成都</option>
+    <!-- 可以继续添加世界主要城市的Location ID -->
+  </select>
+
+  <!-- 天气模块 -->
   <div id="weather">
     <img id="weather-icon" src="" alt="天气图标">
     <div>
@@ -30,36 +47,48 @@
       <p id="weather-temp">温度: 加载中...</p>
     </div>
   </div>
-  <!-- 天气模块结束 -->
 
   <p>Copyright © 2025 晓楠瓜. All Rights Reserved.</p>
 
   <script>
-    // 和风天气 API 配置
-    const API_HOST = 'api.qweather.com'; // 替换为你的 API Host
-    const API_KEY = '05beb2ec0f884c25b8084d6749f37a36'; // 替换为你的 API Key
-    const CITY = '101010100'; // 北京的 Location ID
+    const API_HOST = 'devapi.qweather.com'; // 和风天气官方 API Host
+    const API_KEY = '05beb2ec0f884c25b8084d6749f37a36';
 
-    async function fetchWeather() {
+    const weatherCity = document.getElementById("weather-city");
+    const weatherInfo = document.getElementById("weather-info");
+    const weatherTemp = document.getElementById("weather-temp");
+    const weatherIcon = document.getElementById("weather-icon");
+    const citySelect = document.getElementById("city-select");
+
+    async function fetchWeather(locationId) {
       try {
-        const url = `https://${API_HOST}/v7/weather/now?location=${CITY}&key=${API_KEY}&lang=zh`;
+        const url = `https://${API_HOST}/v7/weather/now?location=${locationId}&key=${API_KEY}&lang=zh`;
         const res = await fetch(url);
         const data = await res.json();
         const now = data.now;
-        document.getElementById('weather-city').textContent = `城市: 北京`;
-        document.getElementById('weather-info').textContent = `天气: ${now.text}`;
-        document.getElementById('weather-temp').textContent = `温度: ${now.temp}°C`;
-        document.getElementById('weather-icon').src = `https://cdn.qweather.com/icons/${now.icon}.png`;
-        document.getElementById('weather-icon').alt = now.text;
+        const cityName = citySelect.options[citySelect.selectedIndex].text;
+        weatherCity.textContent = `城市: ${cityName}`;
+        weatherInfo.textContent = `天气: ${now.text}`;
+        weatherTemp.textContent = `温度: ${now.temp}°C`;
+        // 使用官方图标 URL
+        weatherIcon.src = `https://cdn.qweather.com/icons/${now.icon}.png`;
+        weatherIcon.alt = now.text;
       } catch (err) {
         console.error(err);
-        document.getElementById('weather-city').textContent = '城市: 获取失败';
-        document.getElementById('weather-info').textContent = '天气: 获取失败';
-        document.getElementById('weather-temp').textContent = '温度: 获取失败';
+        weatherCity.textContent = "城市: 获取失败";
+        weatherInfo.textContent = "天气: 获取失败";
+        weatherTemp.textContent = "温度: 获取失败";
+        weatherIcon.src = "";
       }
     }
 
-    fetchWeather();
+    // 初次加载默认城市
+    fetchWeather(citySelect.value);
+
+    // 当用户选择城市变化时
+    citySelect.addEventListener("change", () => {
+      fetchWeather(citySelect.value);
+    });
   </script>
 </body>
 </html>
