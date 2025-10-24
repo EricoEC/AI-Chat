@@ -3,9 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>测试页面</title>
+  <style>
+    body { font-family: "微软雅黑", sans-serif; margin: 20px; }
+    #weather { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      margin-top: 20px; 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      border-radius: 8px;
+      max-width: 300px;
+    }
+    #weather img { width: 50px; height: 50px; }
+  </style>
 </head>
 <body>
   <h1>你好，我的网站已经启动！</h1>
+
+  <!-- 天气模块开始 -->
+  <div id="weather">
+    <img id="weather-icon" src="" alt="天气图标">
+    <div>
+      <p id="weather-city">城市: 加载中...</p>
+      <p id="weather-info">天气: 加载中...</p>
+      <p id="weather-temp">温度: 加载中...</p>
+    </div>
+  </div>
+  <!-- 天气模块结束 -->
+
   <p>Copyright © 2025 晓楠瓜. All Rights Reserved.</p>
+
+  <script>
+    // 和风天气 API Key
+    const API_KEY = "05beb2ec0f884c25b8084d6749f37a36";
+    const CITY = "北京"; // 可以改成你想要显示的城市
+    const weatherCity = document.getElementById("weather-city");
+    const weatherInfo = document.getElementById("weather-info");
+    const weatherTemp = document.getElementById("weather-temp");
+    const weatherIcon = document.getElementById("weather-icon");
+
+    async function fetchWeather() {
+      try {
+        const url = `https://devapi.qweather.com/v7/weather/now?location=${CITY}&key=${API_KEY}&lang=zh`;
+        const res = await fetch(url);
+        const data = await res.json();
+        // 解析数据
+        const now = data.now;
+        weatherCity.textContent = "城市: " + CITY;
+        weatherInfo.textContent = "天气: " + now.text;
+        weatherTemp.textContent = "温度: " + now.temp + "°C";
+        // 天气图标 URL (和风天气提供的图标编号)
+        weatherIcon.src = `https://cdn.qweather.com/icons/${now.icon}.png`;
+        weatherIcon.alt = now.text;
+      } catch (err) {
+        console.error(err);
+        weatherCity.textContent = "城市: 获取失败";
+        weatherInfo.textContent = "天气: 获取失败";
+        weatherTemp.textContent = "温度: 获取失败";
+      }
+    }
+
+    fetchWeather();
+  </script>
 </body>
 </html>
